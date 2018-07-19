@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/tv_payee_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AH2ELmGtD1PuxKQERitiabVqF99hXNvfxR" />
+
+    <TextView
+        android:id="@+id/tv_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_payee_address"
+        android:layout_marginTop="10dp"
+        android:text="100000" />
+
+    <TextView
+        android:id="@+id/tv_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/tv_payee_address"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp"
+        android:text="ok" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/tv_amount"
+        android:background="@color/c_E5E5E5" />
+</RelativeLayout>
