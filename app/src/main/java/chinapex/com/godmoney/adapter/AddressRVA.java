@@ -61,8 +61,12 @@ public class AddressRVA extends RecyclerView.Adapter<AddressRVA.AddressRVAHolder
         }
 
         holder.address.setText(txRecord.getAddress());
+        holder.txId.setText(txRecord.getTxId());
         holder.amount.setText(txRecord.getAmount());
         switch (txRecord.getState()) {
+            case -1:
+                holder.state.setText("unknown");
+                break;
             case 0:
                 holder.state.setText("fail");
                 break;
@@ -70,7 +74,7 @@ public class AddressRVA extends RecyclerView.Adapter<AddressRVA.AddressRVAHolder
                 holder.state.setText("ok");
                 break;
             default:
-                holder.state.setText("unknown");
+                holder.state.setText("exception");
                 break;
         }
 
@@ -84,12 +88,14 @@ public class AddressRVA extends RecyclerView.Adapter<AddressRVA.AddressRVAHolder
 
     class AddressRVAHolder extends RecyclerView.ViewHolder {
         TextView address;
+        TextView txId;
         TextView amount;
         TextView state;
 
         AddressRVAHolder(View itemView) {
             super(itemView);
             address = itemView.findViewById(R.id.tv_payee_address);
+            txId = itemView.findViewById(R.id.tv_tx_id);
             amount = itemView.findViewById(R.id.tv_amount);
             state = itemView.findViewById(R.id.tv_state);
         }

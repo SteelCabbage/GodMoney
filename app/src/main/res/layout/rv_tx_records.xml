@@ -8,13 +8,24 @@
         android:id="@+id/tv_payee_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="AH2ELmGtD1PuxKQERitiabVqF99hXNvfxR" />
+        android:text="AH2ELmGtD1PuxKQERitiabVqF99hXNvfxR"
+        android:textColor="@color/c_4C8EFA" />
 
     <TextView
-        android:id="@+id/tv_amount"
+        android:id="@+id/tv_tx_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tv_payee_address"
+        android:layout_marginTop="10dp"
+        android:text="0xde6c25a30d0f160f3dea6b342ea1c0504f3f82633a9d4b0a96c38f20062165ae"
+        android:textColor="@color/c_54CA80" />
+
+    <TextView
+
+        android:id="@+id/tv_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_tx_id"
         android:layout_marginTop="10dp"
         android:text="100000" />
 
@@ -23,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/tv_payee_address"
+        android:layout_below="@+id/tv_tx_id"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="10dp"
         android:text="ok" />

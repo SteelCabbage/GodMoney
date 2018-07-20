@@ -6,9 +6,19 @@ package chinapex.com.godmoney.bean;
  */
 
 public class TxRecord {
+    private String txId;
     private String address;
     private String amount;
     private int state;
+    private long txTime;
+
+    public String getTxId() {
+        return txId;
+    }
+
+    public void setTxId(String txId) {
+        this.txId = txId;
+    }
 
     public String getAddress() {
         return address;
@@ -32,5 +42,13 @@ public class TxRecord {
 
     public void setState(int state) {
         this.state = state;
+    }
+
+    public long getTxTime() {
+        return txTime;
+    }
+
+    public void setTxTime(long txTime) {
+        this.txTime = txTime;
     }
 }

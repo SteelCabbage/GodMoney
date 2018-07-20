@@ -17,16 +17,19 @@ import chinapex.com.godmoney.R;
 import chinapex.com.godmoney.adapter.AddressRVA;
 import chinapex.com.godmoney.bean.Nep5TxBean;
 import chinapex.com.godmoney.bean.TxRecord;
+import chinapex.com.godmoney.db.GodMoneyDbDao;
 import chinapex.com.godmoney.global.Constant;
 import chinapex.com.godmoney.global.GodMoneyApplication;
 import chinapex.com.godmoney.task.TaskController;
 import chinapex.com.godmoney.task.callback.ICreateNep5TxCallback;
 import chinapex.com.godmoney.task.callback.IFromKeystoreToWalletCallback;
 import chinapex.com.godmoney.task.callback.IGetUtxosCallback;
+import chinapex.com.godmoney.task.callback.IReadAccountsCallback;
 import chinapex.com.godmoney.task.callback.ISendRawTransactionCallback;
 import chinapex.com.godmoney.task.runnable.CreateNep5Tx;
 import chinapex.com.godmoney.task.runnable.FromKeystoreToWallet;
 import chinapex.com.godmoney.task.runnable.GetUtxos;
+import chinapex.com.godmoney.task.runnable.ReadAccounts;
 import chinapex.com.godmoney.task.runnable.SendRawTransaction;
 import chinapex.com.godmoney.utils.CpLog;
 import chinapex.com.godmoney.utils.ToastUtils;
@@ -35,7 +38,7 @@ import neomobile.Wallet;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout
         .OnRefreshListener, AddressRVA.OnItemClickListener, View.OnClickListener,
-        IFromKeystoreToWalletCallback {
+        IFromKeystoreToWalletCallback, IReadAccountsCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private SwipeRefreshLayout mSl_address;
@@ -98,6 +101,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
             }
         });
+
+        loadTxRecords();
     }
 
 
@@ -116,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 TaskController.getInstance().submit(new FromKeystoreToWallet(keystore, pwd, this));
                 break;
             case R.id.bt_import_addresses:
-                loadTxRecords();
+                readFile();
                 break;
             case R.id.bt_god_send:
                 startNep5Tx();
@@ -125,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 break;
         }
     }
-
 
     @Override
     public void fromKeystoreWallet(Wallet wallet) {
@@ -138,23 +142,52 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mGodWallet = wallet;
     }
 
+    private void readFile() {
+        TaskController.getInstance().submit(new ReadAccounts(this));
+    }
+
+    @Override
+    public void readAccounts(final List<TxRecord> txRecords) {
+        loadTxRecords();
+    }
+
     private void loadTxRecords() {
-        int preClearSize = mTxRecords.size();
-        mTxRecords.clear();
-        mAddressRVA.notifyItemRangeRemoved(0, preClearSize);
-        for (int i = 0; i < 9; i++) {
-            TxRecord txRecord = new TxRecord();
-            txRecord.setAddress("ALDbmTMY54RZnLmibH3eXfHvrZt4fLiZhh");
-            txRecord.setAmount("0.0000000" + i);
-            txRecord.setState(-1);
-            mTxRecords.add(txRecord);
+        GodMoneyDbDao godMoneyDbDao = GodMoneyDbDao.getInstance(GodMoneyApplication.getInstance());
+        if (null == godMoneyDbDao) {
+            CpLog.e(TAG, "godMoneyDbDao is null!");
+            return;
         }
-        int size = mTxRecords.size();
-        mAddressRVA.notifyItemRangeInserted(0, size);
-        ToastUtils.getInstance().showToast("import addresses ok!");
+
+        final List<TxRecord> txRecords = godMoneyDbDao.queryTxRecords();
+        if (null == txRecords || txRecords.isEmpty()) {
+            CpLog.e(TAG, "txRecords is null or empty!");
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int preClearSize = mTxRecords.size();
+                mTxRecords.clear();
+                mAddressRVA.notifyItemRangeRemoved(0, preClearSize);
+
+                mTxRecords.addAll(txRecords);
+                int size = mTxRecords.size();
+                mAddressRVA.notifyItemRangeInserted(0, size);
+                ToastUtils.getInstance().showToast("import addresses ok!");
+            }
+        });
+
     }
 
     private void startNep5Tx() {
+        final GodMoneyDbDao godMoneyDbDao = GodMoneyDbDao.getInstance(GodMoneyApplication
+                .getInstance());
+        if (null == godMoneyDbDao) {
+            CpLog.e(TAG, "godMoneyDbDao is null!");
+            return;
+        }
+
         if (null == mTxRecords || mTxRecords.isEmpty()) {
             CpLog.e(TAG, "mTxRecords is null or empty!");
             return;
@@ -166,11 +199,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 continue;
             }
 
+            final String to = txRecord.getAddress();
             Nep5TxBean nep5TxBean = new Nep5TxBean();
             nep5TxBean.setAssetID(Constant.ASSET_CPX);
             nep5TxBean.setAssetDecimal(8);
             nep5TxBean.setAddrFrom(mGodWallet.address());
-            nep5TxBean.setAddrTo(txRecord.getAddress());
+            nep5TxBean.setAddrTo(to);
             nep5TxBean.setTransferAmount(txRecord.getAmount());
             nep5TxBean.setUtxos("[]");
 
@@ -185,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                                 return;
                             }
 
-                            String order = "0x" + tx.getID();
+                            final String order = "0x" + tx.getID();
                             CpLog.i(TAG, "createNep5Tx order:" + order);
 
                             TaskController.getInstance().submit(new SendRawTransaction(tx.getData(),
@@ -193,12 +227,17 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                                         @Override
                                         public void sendTxData(Boolean isSuccess) {
-                                            CpLog.i(TAG, "isSuccess:" + isSuccess);
+                                            if (isSuccess) {
+                                                godMoneyDbDao.updateTxRecord(to, order, 1);
+                                            } else {
+                                                godMoneyDbDao.updateTxRecord(to, order, 0);
+                                            }
                                         }
                                     }));
                         }
                     }));
         }
     }
+
 
 }
