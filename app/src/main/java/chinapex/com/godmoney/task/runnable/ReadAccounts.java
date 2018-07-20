@@ -1,6 +1,5 @@
 package chinapex.com.godmoney.task.runnable;
 
-import android.content.res.AssetManager;
 import android.os.Environment;
 import android.text.TextUtils;
 
@@ -19,7 +18,6 @@ import chinapex.com.godmoney.db.GodMoneyDbDao;
 import chinapex.com.godmoney.global.GodMoneyApplication;
 import chinapex.com.godmoney.task.callback.IReadAccountsCallback;
 import chinapex.com.godmoney.utils.CpLog;
-import neomobile.Tx;
 
 /**
  * Created by SteelCabbage on 2018/7/20 0020 15:50.

@@ -141,7 +141,7 @@ public class GodMoneyDbDao {
         SQLiteDatabase db = openDatabase();
         try {
             db.beginTransaction();
-            db.update(Constant.FIELD_TX_STATE,
+            db.update(Constant.TABLE_TX_RECORD,
                     contentValues,
                     WHERE_CLAUSE_TX_ADDRESS_EQ,
                     new String[]{address});

@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,12 +24,10 @@ import chinapex.com.godmoney.global.GodMoneyApplication;
 import chinapex.com.godmoney.task.TaskController;
 import chinapex.com.godmoney.task.callback.ICreateNep5TxCallback;
 import chinapex.com.godmoney.task.callback.IFromKeystoreToWalletCallback;
-import chinapex.com.godmoney.task.callback.IGetUtxosCallback;
 import chinapex.com.godmoney.task.callback.IReadAccountsCallback;
 import chinapex.com.godmoney.task.callback.ISendRawTransactionCallback;
 import chinapex.com.godmoney.task.runnable.CreateNep5Tx;
 import chinapex.com.godmoney.task.runnable.FromKeystoreToWallet;
-import chinapex.com.godmoney.task.runnable.GetUtxos;
 import chinapex.com.godmoney.task.runnable.ReadAccounts;
 import chinapex.com.godmoney.task.runnable.SendRawTransaction;
 import chinapex.com.godmoney.utils.CpLog;
@@ -48,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private EditText mEt_keystore;
     private EditText mEt_keystore_pwd;
     private Wallet mGodWallet;
+    private TextView mTv_god_address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         initData();
         initView();
+        loadTxRecords();
     }
 
     private void initData() {
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private void initView() {
         mEt_keystore = (EditText) findViewById(R.id.et_keystore);
         mEt_keystore_pwd = (EditText) findViewById(R.id.et_keystore_pwd);
+        mTv_god_address = (TextView) findViewById(R.id.tv_god_address);
         mSl_address = (SwipeRefreshLayout) findViewById(R.id.sl_address);
         mRv_address = (RecyclerView) findViewById(R.id.rv_address);
 
@@ -102,7 +104,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
         });
 
-        loadTxRecords();
+        showTxResults();
+    }
+
+    private void showTxResults() {
+        if (null == mTxRecords || mTxRecords.isEmpty()) {
+            CpLog.e(TAG, "mTxRecords is null or empty!");
+            return;
+        }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mAddressRVA.notifyDataSetChanged();
+            }
+        });
     }
 
 
@@ -140,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
 
         mGodWallet = wallet;
+        mTv_god_address.setText(mGodWallet.address());
     }
 
     private void readFile() {
@@ -148,6 +165,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void readAccounts(final List<TxRecord> txRecords) {
+        if (null == txRecords || txRecords.isEmpty()) {
+            CpLog.e(TAG, "txRecords is null or empty!");
+            return;
+        }
+
+        ToastUtils.getInstance().showToast("import addresses ok!");
         loadTxRecords();
     }
 
@@ -174,37 +197,28 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 mTxRecords.addAll(txRecords);
                 int size = mTxRecords.size();
                 mAddressRVA.notifyItemRangeInserted(0, size);
-                ToastUtils.getInstance().showToast("import addresses ok!");
             }
         });
 
     }
 
     private void startNep5Tx() {
-        final GodMoneyDbDao godMoneyDbDao = GodMoneyDbDao.getInstance(GodMoneyApplication
-                .getInstance());
-        if (null == godMoneyDbDao) {
-            CpLog.e(TAG, "godMoneyDbDao is null!");
-            return;
-        }
-
         if (null == mTxRecords || mTxRecords.isEmpty()) {
             CpLog.e(TAG, "mTxRecords is null or empty!");
             return;
         }
 
-        for (TxRecord txRecord : mTxRecords) {
+        for (final TxRecord txRecord : mTxRecords) {
             if (null == txRecord) {
                 CpLog.e(TAG, "txRecord is null!");
                 continue;
             }
 
-            final String to = txRecord.getAddress();
             Nep5TxBean nep5TxBean = new Nep5TxBean();
             nep5TxBean.setAssetID(Constant.ASSET_CPX);
             nep5TxBean.setAssetDecimal(8);
             nep5TxBean.setAddrFrom(mGodWallet.address());
-            nep5TxBean.setAddrTo(to);
+            nep5TxBean.setAddrTo(txRecord.getAddress());
             nep5TxBean.setTransferAmount(txRecord.getAmount());
             nep5TxBean.setUtxos("[]");
 
@@ -227,10 +241,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                                         @Override
                                         public void sendTxData(Boolean isSuccess) {
+                                            txRecord.setTxId(order);
                                             if (isSuccess) {
-                                                godMoneyDbDao.updateTxRecord(to, order, 1);
+                                                txRecord.setState(1);
                                             } else {
-                                                godMoneyDbDao.updateTxRecord(to, order, 0);
+                                                txRecord.setState(0);
                                             }
                                         }
                                     }));
