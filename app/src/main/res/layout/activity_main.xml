@@ -36,7 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:orientation="horizontal"
-        android:weightSum="3">
+        android:weightSum="4">
 
         <Button
             android:id="@+id/bt_generate_wallet"
@@ -44,7 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/c_54CA80"
-            android:text="Generate wallet"
+            android:gravity="center"
+            android:text="Generate \n wallet"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
 
@@ -55,7 +56,8 @@
             android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@color/c_54CA80"
-            android:text="Import addresses"
+            android:gravity="center"
+            android:text="Import \n addresses"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
 
@@ -66,7 +68,20 @@
             android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@color/c_54CA80"
-            android:text="God send"
+            android:gravity="center"
+            android:text="God \n send"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/bt_generate_records"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:background="@color/c_54CA80"
+            android:gravity="center"
+            android:text="Generate \n records"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
 

@@ -26,10 +26,12 @@ import chinapex.com.godmoney.task.callback.ICreateNep5TxCallback;
 import chinapex.com.godmoney.task.callback.IFromKeystoreToWalletCallback;
 import chinapex.com.godmoney.task.callback.IReadAccountsCallback;
 import chinapex.com.godmoney.task.callback.ISendRawTransactionCallback;
+import chinapex.com.godmoney.task.callback.IWriteRecordsCallback;
 import chinapex.com.godmoney.task.runnable.CreateNep5Tx;
 import chinapex.com.godmoney.task.runnable.FromKeystoreToWallet;
 import chinapex.com.godmoney.task.runnable.ReadAccounts;
 import chinapex.com.godmoney.task.runnable.SendRawTransaction;
+import chinapex.com.godmoney.task.runnable.WriteRecords;
 import chinapex.com.godmoney.utils.CpLog;
 import chinapex.com.godmoney.utils.ToastUtils;
 import neomobile.Tx;
@@ -37,7 +39,7 @@ import neomobile.Wallet;
 
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout
         .OnRefreshListener, AddressRVA.OnItemClickListener, View.OnClickListener,
-        IFromKeystoreToWalletCallback, IReadAccountsCallback {
+        IFromKeystoreToWalletCallback, IReadAccountsCallback, IWriteRecordsCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private SwipeRefreshLayout mSl_address;
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private EditText mEt_keystore_pwd;
     private Wallet mGodWallet;
     private TextView mTv_god_address;
+    private Button mBt_generate_records;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         mTv_god_address = (TextView) findViewById(R.id.tv_god_address);
         mSl_address = (SwipeRefreshLayout) findViewById(R.id.sl_address);
         mRv_address = (RecyclerView) findViewById(R.id.rv_address);
+        mBt_generate_records = (Button) findViewById(R.id.bt_generate_records);
 
         Button bt_generate_wallet = (Button) findViewById(R.id.bt_generate_wallet);
         Button bt_import_addresses = (Button) findViewById(R.id.bt_import_addresses);
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bt_generate_wallet.setOnClickListener(this);
         bt_import_addresses.setOnClickListener(this);
         bt_god_send.setOnClickListener(this);
+        mBt_generate_records.setOnClickListener(this);
     }
 
     @Override
@@ -142,6 +147,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             case R.id.bt_god_send:
                 startNep5Tx();
                 break;
+            case R.id.bt_generate_records:
+                writeFile();
+                break;
             default:
                 break;
         }
@@ -172,6 +180,24 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         ToastUtils.getInstance().showToast("import addresses ok!");
         loadTxRecords();
+    }
+
+    private void writeFile() {
+        TaskController.getInstance().submit(new WriteRecords(this, mTxRecords));
+    }
+
+    @Override
+    public void writeRecords(final boolean writeState) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (writeState) {
+                    ToastUtils.getInstance().showToast("交易记录写入完成");
+                } else {
+                    ToastUtils.getInstance().showToast("交易记录写入异常");
+                }
+            }
+        });
     }
 
     private void loadTxRecords() {
@@ -235,12 +261,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                             final String order = "0x" + tx.getID();
                             CpLog.i(TAG, "createNep5Tx order:" + order);
+                            CpLog.i(TAG, "createNep5Tx data:" + tx.getData());
 
                             TaskController.getInstance().submit(new SendRawTransaction(tx.getData(),
                                     new ISendRawTransactionCallback() {
 
                                         @Override
                                         public void sendTxData(Boolean isSuccess) {
+                                            CpLog.i(TAG, "isSuccess:" + isSuccess);
                                             txRecord.setTxId(order);
                                             if (isSuccess) {
                                                 txRecord.setState(1);
@@ -253,6 +281,5 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     }));
         }
     }
-
 
 }
