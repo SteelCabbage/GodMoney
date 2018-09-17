@@ -67,6 +67,7 @@ public class SendRawTransaction implements Runnable, INetCallback {
     @Override
     public void onFailed(int failedCode, String msg) {
         CpLog.e(TAG, "onFailed() -> msg:" + msg);
+        CpLog.e(TAG, "onFailed() -> mTxData:" + mTxData);
         mISendRawTransactionCallback.sendTxData(false);
     }
 }

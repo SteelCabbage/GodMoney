@@ -268,11 +268,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
                                         @Override
                                         public void sendTxData(Boolean isSuccess) {
-                                            CpLog.i(TAG, "isSuccess:" + isSuccess);
                                             txRecord.setTxId(order);
                                             if (isSuccess) {
+                                                CpLog.i(TAG, "order broadcast ok:" + order);
                                                 txRecord.setState(1);
                                             } else {
+                                                CpLog.e(TAG, "order broadcast fail:" + order);
                                                 txRecord.setState(0);
                                             }
                                         }
