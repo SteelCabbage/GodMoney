@@ -16,12 +16,12 @@ public class Constant {
     public static final int NET_BODY_NULL = 0;
 
     // neo正式网
-//    public static final String HOSTNAME_VERIFIER = "tracker.chinapex.com.cn";
-    public static final String HOSTNAME_VERIFIER = "172.16.12.188";
-    //    public static final String URL_CLI = "https://tracker.chinapex.com.cn/neo-cli/";
-    public static final String URL_CLI = "http://172.16.12.188:10332";
-    //    public static final String URL_UTXOS = "https://tracker.chinapex.com.cn/tool/utxos/";
-    public static final String URL_UTXOS = "http://172.16.12.188:10332";
+    public static final String HOSTNAME_VERIFIER = "tracker.chinapex.com.cn";
+    //    public static final String HOSTNAME_VERIFIER = "172.16.12.188";
+    public static final String URL_CLI = "https://tracker.chinapex.com.cn/neo-cli/";
+    //    public static final String URL_CLI = "http://172.16.12.188:10332";
+    public static final String URL_UTXOS = "https://tracker.chinapex.com.cn/tool/utxos/";
+//    public static final String URL_UTXOS = "http://172.16.12.188:10332";
 
     // asset
     public static final String ASSET_CPX = "0x45d493a6f73fa5f404244a5fb8472fc014ca5885";
