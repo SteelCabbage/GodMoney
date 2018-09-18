@@ -8,9 +8,9 @@ package chinapex.com.godmoney.global;
 public class Constant {
 
     // net
-    public static final long CONNECT_TIMEOUT = 10;
-    public static final long READ_TIMEOUT = 10;
-    public static final long WRITE_TIMEOUT = 10;
+    public static final long CONNECT_TIMEOUT = 20;
+    public static final long READ_TIMEOUT = 20;
+    public static final long WRITE_TIMEOUT = 20;
     public static final int NET_ERROR = -1;
     public static final int NET_SUCCESS = 1;
     public static final int NET_BODY_NULL = 0;
