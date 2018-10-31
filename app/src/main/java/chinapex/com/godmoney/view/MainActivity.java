@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void showTxResults() {
         if (null == mTxRecords || mTxRecords.isEmpty()) {
-            CpLog.e(TAG, "mTxRecords is null or empty!");
+            CpLog.e(TAG, "showTxResults() -> mTxRecords is null or empty!");
             return;
         }
 
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     @Override
     public void readAccounts(final List<TxRecord> txRecords) {
         if (null == txRecords || txRecords.isEmpty()) {
-            CpLog.e(TAG, "txRecords is null or empty!");
+            CpLog.e(TAG, "readAccounts() -> txRecords is null or empty!");
             return;
         }
 
@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         final List<TxRecord> txRecords = godMoneyDbDao.queryTxRecords();
         if (null == txRecords || txRecords.isEmpty()) {
-            CpLog.e(TAG, "txRecords is null or empty!");
+            CpLog.e(TAG, "loadTxRecords() -> txRecords is null or empty!");
             return;
         }
 
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     private void startNep5Tx() {
         if (null == mTxRecords || mTxRecords.isEmpty()) {
-            CpLog.e(TAG, "mTxRecords is null or empty!");
+            CpLog.e(TAG, "startNep5Tx() -> mTxRecords is null or empty!");
             return;
         }
 

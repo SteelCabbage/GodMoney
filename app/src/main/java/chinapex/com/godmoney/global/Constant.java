@@ -15,13 +15,15 @@ public class Constant {
     public static final int NET_SUCCESS = 1;
     public static final int NET_BODY_NULL = 0;
 
-    // neo正式网
+    // hostname verifier
     public static final String HOSTNAME_VERIFIER = "tracker.chinapex.com.cn";
-    //    public static final String HOSTNAME_VERIFIER = "172.16.12.188";
-    public static final String URL_CLI = "https://tracker.chinapex.com.cn/neo-cli/";
-    //    public static final String URL_CLI = "http://172.16.12.188:10332";
-    public static final String URL_UTXOS = "https://tracker.chinapex.com.cn/tool/utxos/";
-//    public static final String URL_UTXOS = "http://172.16.12.188:10332";
+
+    // java server root path
+    public static final String SERVER_ROOT_PATH_JAVA = "https://tracker.chinapex.com.cn/tool/jar-serv/";
+
+    // neo正式网
+    public static final String URL_CLI = "https://tracker.chinapex.com.cn/neo-cli-2-9/";
+    public static final String URL_UTXOS = SERVER_ROOT_PATH_JAVA + "utxos?address=";
 
     // asset
     public static final String ASSET_CPX = "0x45d493a6f73fa5f404244a5fb8472fc014ca5885";
