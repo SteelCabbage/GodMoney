@@ -36,6 +36,7 @@ import chinapex.com.godmoney.task.runnable.ReadAccounts;
 import chinapex.com.godmoney.task.runnable.SendRawTransaction;
 import chinapex.com.godmoney.task.runnable.WriteRecords;
 import chinapex.com.godmoney.utils.CpLog;
+import chinapex.com.godmoney.utils.PhoneUtils;
 import chinapex.com.godmoney.utils.ToastUtils;
 import neomobile.Tx;
 import neomobile.Wallet;
@@ -122,7 +123,25 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onItemClick(int position) {
+        if (null == mTxRecords || mTxRecords.isEmpty()) {
+            CpLog.e(TAG, "onItemClick() -> mTxRecords is null or empty!");
+            return;
+        }
 
+        TxRecord txRecord = mTxRecords.get(position);
+        if (null == txRecord) {
+            CpLog.e(TAG, "onItemClick() -> txRecord is null!");
+            return;
+        }
+
+        String txId = txRecord.getTxId();
+        if (TextUtils.isEmpty(txId)) {
+            CpLog.e(TAG, "txId is null!");
+            return;
+        }
+
+        PhoneUtils.copy2Clipboard(GodMoneyApplication.getInstance(), txId);
+        ToastUtils.getInstance().showToast("num: " + position + ", copy success! txId: " + txId);
     }
 
     @Override
