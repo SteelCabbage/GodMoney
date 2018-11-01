@@ -130,7 +130,7 @@ public class GodMoneyDbDao {
 
     public void updateTxRecord(String address, String txID, int txState) {
         if (TextUtils.isEmpty(address) || TextUtils.isEmpty(txID)) {
-            CpLog.e(TAG, "updateTxState() -> address or txID is null!");
+            CpLog.e(TAG, "updateTxRecord() -> address or txID is null!");
             return;
         }
 
@@ -146,7 +146,7 @@ public class GodMoneyDbDao {
                     WHERE_CLAUSE_TX_ADDRESS_EQ,
                     new String[]{address});
             db.setTransactionSuccessful();
-            CpLog.i(TAG, "updateTxState -> update: " + txID + " ok!");
+            CpLog.i(TAG, "updateTxRecord -> update: " + address + " ok!");
         } catch (SQLException e) {
             CpLog.e(TAG, "updateTxState exception:" + e.getMessage());
         } finally {

@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private Wallet mGodWallet;
     private TextView mTv_god_address;
     private Button mBt_generate_records;
+    private boolean isCanRefresh = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +147,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
+        if (!isCanRefresh) {
+            mSl_address.setRefreshing(false);
+            ToastUtils.getInstance().showToast("交易记录还未写入文件！请不要刷新！");
+            CpLog.e(TAG, "txRecords have not been written! Don't refresh!");
+            return;
+        }
+
         loadTxRecords();
     }
 
@@ -186,7 +194,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
 
         mGodWallet = wallet;
-        mTv_god_address.setText(mGodWallet.address());
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTv_god_address.setText(mGodWallet.address());
+            }
+        });
     }
 
     private void readFile() {
@@ -222,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             public void run() {
                 if (writeState) {
                     ToastUtils.getInstance().showToast("交易记录写入完成");
+                    isCanRefresh = true;
                 } else {
                     ToastUtils.getInstance().showToast("交易记录写入异常");
                 }
@@ -262,10 +276,18 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
     private void startNep5Tx() {
+        if (null == mGodWallet) {
+            CpLog.e(TAG, "startNep5Tx() -> mGodWallet is null!");
+            ToastUtils.getInstance().showToast("人类！上帝不在线哟~~");
+            return;
+        }
+
         if (null == mTxRecords || mTxRecords.isEmpty()) {
             CpLog.e(TAG, "startNep5Tx() -> mTxRecords is null or empty!");
             return;
         }
+
+        isCanRefresh = false;
 
         for (final TxRecord txRecord : mTxRecords) {
             if (null == txRecord) {
