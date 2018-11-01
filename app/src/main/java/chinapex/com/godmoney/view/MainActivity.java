@@ -253,6 +253,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         final List<TxRecord> txRecords = godMoneyDbDao.queryTxRecords();
         if (null == txRecords || txRecords.isEmpty()) {
             CpLog.e(TAG, "loadTxRecords() -> txRecords is null or empty!");
+
+            if (mSl_address.isRefreshing()) {
+                mSl_address.setRefreshing(false);
+            }
+
             return;
         }
 
