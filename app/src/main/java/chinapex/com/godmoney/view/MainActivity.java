@@ -41,7 +41,7 @@ import chinapex.com.godmoney.utils.ToastUtils;
 import neomobile.Tx;
 import neomobile.Wallet;
 
-public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout
+public class MainActivity extends BaseActivity implements SwipeRefreshLayout
         .OnRefreshListener, AddressRVA.OnItemClickListener, View.OnClickListener,
         IFromKeystoreToWalletCallback, IReadAccountsCallback, IWriteRecordsCallback {
 

@@ -8,6 +8,7 @@
     tools:context="chinapex.com.godmoney.view.MainActivity">
 
     <EditText
+        android:layout_marginTop="30dp"
         android:id="@+id/et_keystore"
         android:layout_width="match_parent"
         android:layout_height="50dp"
