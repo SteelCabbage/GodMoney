@@ -5,9 +5,19 @@
     android:padding="5dp">
 
     <TextView
+        android:id="@+id/tv_address_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="000"
+        android:textColor="@android:color/holo_red_light" />
+
+    <TextView
         android:id="@+id/tv_payee_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="20dp"
         android:text="AH2ELmGtD1PuxKQERitiabVqF99hXNvfxR"
         android:textColor="@color/c_4C8EFA" />
 
@@ -33,10 +43,10 @@
         android:id="@+id/tv_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@+id/tv_tx_id"
-        android:layout_marginEnd="20dp"
+        android:layout_alignParentEnd="true"
         android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
         android:text="ok" />
 
     <View

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chinapex.com.godmoney.bean.TxRecord;
+import chinapex.com.godmoney.db.GodMoneyDbDao;
+import chinapex.com.godmoney.global.GodMoneyApplication;
 import chinapex.com.godmoney.task.callback.IWriteRecordsCallback;
 import chinapex.com.godmoney.utils.CpLog;
 
@@ -45,12 +47,20 @@ public class WriteRecords implements Runnable {
             return;
         }
 
+        GodMoneyDbDao godMoneyDbDao = GodMoneyDbDao.getInstance(GodMoneyApplication.getInstance());
+        if (null == godMoneyDbDao) {
+            CpLog.e(TAG, "godMoneyDbDao is null!");
+            return;
+        }
+
         ArrayList<String> records = new ArrayList<>();
         for (TxRecord txRecord : mTxRecords) {
             if (null == txRecord) {
                 CpLog.e(TAG, "txRecord is null!");
                 continue;
             }
+
+            godMoneyDbDao.updateTxRecord(txRecord.getAddress(), txRecord.getTxId(), txRecord.getState());
 
             CpLog.i(TAG, "txRecord:" + txRecord.getAddress() + ","
                     + txRecord.getAmount() + ","

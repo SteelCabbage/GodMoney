@@ -60,6 +60,7 @@ public class AddressRVA extends RecyclerView.Adapter<AddressRVA.AddressRVAHolder
             return;
         }
 
+        holder.num.setText(String.valueOf(position));
         holder.address.setText(txRecord.getAddress());
         holder.txId.setText(txRecord.getTxId());
         holder.amount.setText(txRecord.getAmount());
@@ -87,6 +88,7 @@ public class AddressRVA extends RecyclerView.Adapter<AddressRVA.AddressRVAHolder
     }
 
     class AddressRVAHolder extends RecyclerView.ViewHolder {
+        TextView num;
         TextView address;
         TextView txId;
         TextView amount;
@@ -94,6 +96,7 @@ public class AddressRVA extends RecyclerView.Adapter<AddressRVA.AddressRVAHolder
 
         AddressRVAHolder(View itemView) {
             super(itemView);
+            num = itemView.findViewById(R.id.tv_address_num);
             address = itemView.findViewById(R.id.tv_payee_address);
             txId = itemView.findViewById(R.id.tv_tx_id);
             amount = itemView.findViewById(R.id.tv_amount);

@@ -1,5 +1,8 @@
 package chinapex.com.godmoney.view;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         IFromKeystoreToWalletCallback, IReadAccountsCallback, IWriteRecordsCallback {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int REQUEST_PERMISSION = 201;
     private SwipeRefreshLayout mSl_address;
     private RecyclerView mRv_address;
     private List<TxRecord> mTxRecords;
@@ -57,13 +61,36 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkPermission();
         initData();
         initView();
-        loadTxRecords();
+    }
+
+    private void checkPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
+                    || checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA},
+                        REQUEST_PERMISSION);
+            }
+        }
     }
 
     private void initData() {
         mTxRecords = new ArrayList<>();
+        GodMoneyDbDao godMoneyDbDao = GodMoneyDbDao.getInstance(GodMoneyApplication.getInstance());
+        if (null == godMoneyDbDao) {
+            CpLog.e(TAG, "initData() -> godMoneyDbDao is null!");
+            return;
+        }
+
+        List<TxRecord> txRecords = godMoneyDbDao.queryTxRecords();
+        if (null == txRecords || txRecords.isEmpty()) {
+            CpLog.e(TAG, "initData() -> txRecords is null or empty!");
+            return;
+        }
+
+        mTxRecords.addAll(txRecords);
     }
 
     private void initView() {
@@ -100,32 +127,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     @Override
     public void onRefresh() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (mSl_address.isRefreshing()) {
-                    mSl_address.setRefreshing(false);
-                }
-            }
-        });
-
-        showTxResults();
+        loadTxRecords();
     }
-
-    private void showTxResults() {
-        if (null == mTxRecords || mTxRecords.isEmpty()) {
-            CpLog.e(TAG, "showTxResults() -> mTxRecords is null or empty!");
-            return;
-        }
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mAddressRVA.notifyDataSetChanged();
-            }
-        });
-    }
-
 
     @Override
     public void onClick(View v) {
@@ -178,7 +181,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             return;
         }
 
-        ToastUtils.getInstance().showToast("import addresses ok!");
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                CpLog.i(TAG, "readAccounts() -> import addresses ok!");
+                ToastUtils.getInstance().showToast("import addresses ok!");
+            }
+        });
+
         loadTxRecords();
     }
 
@@ -223,6 +233,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 mTxRecords.addAll(txRecords);
                 int size = mTxRecords.size();
                 mAddressRVA.notifyItemRangeInserted(0, size);
+
+                if (mSl_address.isRefreshing()) {
+                    mSl_address.setRefreshing(false);
+                }
             }
         });
 
